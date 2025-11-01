@@ -2,53 +2,53 @@
 
 A full-stack vacation management system built with TypeScript, featuring separate interfaces for managers and employees to handle vacation requests.
 
-## 🚀 Features
+## Features
 
 ### Manager Account
-- ✅ View all registered users
-- ✅ Create new user accounts (employees/managers)
-- ✅ Update user information (name, email, password)
-- ✅ Delete users and their associated data
-- ✅ **View all vacation requests from employees**
-- ✅ **Approve or reject vacation requests with one click**
-- ✅ **Separate pending and processed requests**
-- ✅ **See employee details with each request**
-- ✅ Navigation between Users and Vacation Requests
-- ✅ Secure authentication with JWT
+- View all registered users
+- Create new user accounts (employees/managers)
+- Update user information (name, email, password)
+- Delete users and their associated data
+- View all vacation requests from employees
+- Approve or reject vacation requests with one click
+- Separate pending and processed requests
+- See employee details with each request
+- Navigation between Users and Vacation Requests
+- Secure authentication with JWT
 
 ### Employee Account
-- ✅ View personal vacation requests
-- ✅ Create new vacation requests with date range and reason
-- ✅ Delete pending vacation requests
-- ✅ See request status (pending, approved, rejected)
+- View personal vacation requests
+- Create new vacation requests with date range and reason
+- Delete pending vacation requests
+- See request status (pending, approved, rejected)
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend
-- **TypeScript** with Node.js (native HTTP server, no Express)
-- **PostgreSQL** for database
-- **bcrypt** for password hashing
-- **jsonwebtoken** for JWT authentication
-- **Zod** for input validation
-- **pg** (node-postgres) for database connection
+- TypeScript with Node.js (native HTTP server, no Express)
+- PostgreSQL for database
+- bcrypt for password hashing
+- jsonwebtoken for JWT authentication
+- Zod for input validation
+- pg (node-postgres) for database connection
 
-### Frontend (Coming Soon)
+### Frontend
 - React 18 with TypeScript
 - Vite for build tooling
-- TailwindCSS + shadcn/ui for modern UI
+- TailwindCSS for styling
 - React Router for navigation
 
 ### DevOps
 - Docker & Docker Compose for containerization
 - PostgreSQL 16 Alpine
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js 20+ 
 - Docker & Docker Compose (for containerized setup)
 - PostgreSQL 16+ (if running locally without Docker)
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Option 1: Docker (Recommended)
 
@@ -121,7 +121,7 @@ The API will be available at `http://localhost:3000`
    npm run dev
    ```
 
-## 🔐 Default Credentials
+## Default Credentials
 
 After seeding the database, use these credentials:
 
@@ -135,7 +135,7 @@ After seeding the database, use these credentials:
 - `carol.williams@company.com` / `password123`
 - `david.brown@company.com` / `password123`
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Authentication
 - `POST /api/auth/login` - Login and get JWT token
@@ -156,7 +156,7 @@ After seeding the database, use these credentials:
 - `PUT /api/requests/:id/reject` - Reject request (manager only)
 - `DELETE /api/requests/:id` - Delete pending request
 
-## 🧪 Testing the API
+## Testing the API
 
 ### Login as Manager
 ```bash
@@ -197,7 +197,7 @@ curl -X PUT http://localhost:3000/api/requests/1/approve \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
-## 🗄️ Database Schema
+## Database Schema
 
 ### Users Table
 - `id` - Serial primary key
@@ -217,16 +217,16 @@ curl -X PUT http://localhost:3000/api/requests/1/approve \
 - `status` - 'pending', 'approved', or 'rejected'
 - `submitted_at`, `updated_at` - Timestamps
 
-## 🔒 Security Features
+## Security Features
 
-- ✅ **Password Hashing** - bcrypt with 10 salt rounds
-- ✅ **JWT Authentication** - Secure token-based auth
-- ✅ **Input Validation** - Zod schemas for all inputs
-- ✅ **SQL Injection Prevention** - Parameterized queries
-- ✅ **Role-Based Access Control** - Manager/Employee permissions
-- ✅ **CORS Configuration** - Controlled cross-origin requests
+- Password Hashing - bcrypt with 10 salt rounds
+- JWT Authentication - Secure token-based auth
+- Input Validation - Zod schemas for all inputs
+- SQL Injection Prevention - Parameterized queries
+- Role-Based Access Control - Manager/Employee permissions
+- CORS Configuration - Controlled cross-origin requests
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 backend/
@@ -244,7 +244,7 @@ backend/
 └── Dockerfile
 ```
 
-## 🧹 Available Scripts
+## Available Scripts
 
 ```bash
 npm run dev          # Start development server with hot reload
@@ -257,7 +257,7 @@ npm run lint         # Lint code
 npm run format       # Format code with Prettier
 ```
 
-## 🐳 Docker Commands
+## Docker Commands
 
 ```bash
 # Start all services
@@ -276,23 +276,15 @@ docker-compose down
 docker-compose down -v
 ```
 
-## 🎯 Development Practices
+## Development Practices
 
-- **No Framework** - Custom HTTP server without Express
-- **Clean Architecture** - Separation of concerns (controllers, repositories, services)
-- **Type Safety** - Full TypeScript coverage
-- **Validation** - Zod schemas for runtime type checking
-- **Security First** - Authentication, authorization, input validation
-- **Database Design** - Normalized schema with proper indexes
-- **Error Handling** - Consistent error responses
-- **Code Quality** - ESLint and Prettier configured
-
-## 📝 Next Steps
-
-- [ ] Add unit and integration tests
-- [ ] Implement email notifications
-- [ ] Add vacation day balance tracking
-- [ ] Create admin dashboard with analytics
-- [ ] Add request history and audit logs
+- No Framework - Custom HTTP server without Express
+- Clean Architecture - Separation of concerns (controllers, repositories, services)
+- Type Safety - Full TypeScript coverage
+- Validation - Zod schemas for runtime type checking
+- Security First - Authentication, authorization, input validation
+- Database Design - Normalized schema with proper indexes
+- Error Handling - Consistent error responses
+- Code Quality - ESLint and Prettier configured
 
 

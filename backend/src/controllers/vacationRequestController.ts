@@ -1,5 +1,5 @@
 import { VacationRequestRepository } from '../repositories/vacationRequestRepository.js';
-import { createVacationRequestSchema, updateRequestStatusSchema } from '../utils/validation.js';
+import { createVacationRequestSchema } from '../utils/validation.js';
 import {
   sendSuccess,
   sendCreated,
