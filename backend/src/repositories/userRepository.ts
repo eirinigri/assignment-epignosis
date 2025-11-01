@@ -8,7 +8,8 @@ export class UserRepository {
    */
   async findAll(): Promise<User[]> {
     const query = `
-      SELECT id, name, email, employee_code, role, created_at, updated_at
+      SELECT id, name, email, employee_code, role, vacation_days_total, 
+             vacation_days_used, created_at, updated_at
       FROM users
       ORDER BY created_at DESC
     `;
@@ -21,7 +22,8 @@ export class UserRepository {
    */
   async findById(id: number): Promise<User | null> {
     const query = `
-      SELECT id, name, email, employee_code, role, created_at, updated_at
+      SELECT id, name, email, employee_code, role, vacation_days_total,
+             vacation_days_used, created_at, updated_at
       FROM users
       WHERE id = $1
     `;
@@ -34,7 +36,8 @@ export class UserRepository {
    */
   async findByEmail(email: string): Promise<UserWithPassword | null> {
     const query = `
-      SELECT id, name, email, employee_code, password_hash, role, created_at, updated_at
+      SELECT id, name, email, employee_code, password_hash, role, 
+             vacation_days_total, vacation_days_used, created_at, updated_at
       FROM users
       WHERE email = $1
     `;
@@ -47,7 +50,8 @@ export class UserRepository {
    */
   async findByEmployeeCode(employeeCode: string): Promise<User | null> {
     const query = `
-      SELECT id, name, email, employee_code, role, created_at, updated_at
+      SELECT id, name, email, employee_code, role, vacation_days_total,
+             vacation_days_used, created_at, updated_at
       FROM users
       WHERE employee_code = $1
     `;
@@ -62,7 +66,8 @@ export class UserRepository {
     const query = `
       INSERT INTO users (name, email, employee_code, password_hash, role)
       VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, name, email, employee_code, role, created_at, updated_at
+      RETURNING id, name, email, employee_code, role, vacation_days_total,
+                vacation_days_used, created_at, updated_at
     `;
     const result = await pool.query<User>(query, [
       data.name,
@@ -104,7 +109,8 @@ export class UserRepository {
       UPDATE users
       SET ${updates.join(', ')}
       WHERE id = $${paramCount}
-      RETURNING id, name, email, employee_code, role, created_at, updated_at
+      RETURNING id, name, email, employee_code, role, vacation_days_total,
+                vacation_days_used, created_at, updated_at
     `;
     
     const result = await pool.query<User>(query, values);
@@ -150,5 +156,30 @@ export class UserRepository {
     
     const result = await pool.query(query, params);
     return result.rows.length > 0;
+  }
+
+  /**
+   * Update user's vacation days used
+   */
+  async updateVacationDaysUsed(userId: number, daysToAdd: number): Promise<void> {
+    const query = `
+      UPDATE users
+      SET vacation_days_used = vacation_days_used + $1
+      WHERE id = $2
+    `;
+    await pool.query(query, [daysToAdd, userId]);
+  }
+
+  /**
+   * Get user's remaining vacation days
+   */
+  async getRemainingVacationDays(userId: number): Promise<number> {
+    const query = `
+      SELECT (vacation_days_total - vacation_days_used) as remaining
+      FROM users
+      WHERE id = $1
+    `;
+    const result = await pool.query<{ remaining: number }>(query, [userId]);
+    return result.rows[0]?.remaining ?? 0;
   }
 }

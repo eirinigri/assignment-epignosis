@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import type { User } from '../types';
 
 export default function RequestForm() {
   const [startDate, setStartDate] = useState('');
@@ -8,7 +9,33 @@ export default function RequestForm() {
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
+    try {
+      const response = await api.get('/auth/me');
+      setUser(response.data.data);
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+    }
+  };
+
+  const calculateDays = () => {
+    if (!startDate || !endDate) return 0;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays + 1;
+  };
+
+  const daysNeeded = calculateDays();
+  const remainingDays = user ? user.vacation_days_total - user.vacation_days_used : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +81,36 @@ export default function RequestForm() {
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Vacation Balance Info */}
+        {user && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-sm font-semibold text-blue-900">Available Vacation Days</h3>
+                <p className="text-2xl font-bold text-blue-600 mt-1">
+                  {remainingDays} days
+                </p>
+                <p className="text-xs text-blue-700 mt-1">
+                  {user.vacation_days_used} of {user.vacation_days_total} used
+                </p>
+              </div>
+              {daysNeeded > 0 && (
+                <div className="text-right">
+                  <p className="text-sm text-gray-600">Requesting</p>
+                  <p className={`text-2xl font-bold ${
+                    daysNeeded > remainingDays ? 'text-red-600' : 'text-green-600'
+                  }`}>
+                    {daysNeeded} days
+                  </p>
+                  {daysNeeded > remainingDays && (
+                    <p className="text-xs text-red-600 mt-1">Insufficient balance!</p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">New Vacation Request</h2>
 

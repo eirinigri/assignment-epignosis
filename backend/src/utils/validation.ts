@@ -38,7 +38,25 @@ export const createVacationRequestSchema = z.object({
 
 export const updateRequestStatusSchema = z.object({
   status: z.enum(['approved', 'rejected']),
+  manager_notes: z.string().max(1000).optional(),
 });
+
+export const updateVacationRequestSchema = z.object({
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)').optional(),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)').optional(),
+  reason: z.string().max(1000).optional(),
+}).refine(
+  (data) => {
+    if (data.start_date && data.end_date) {
+      return new Date(data.end_date) >= new Date(data.start_date);
+    }
+    return true;
+  },
+  {
+    message: 'End date must be on or after start date',
+    path: ['end_date'],
+  }
+);
 
 // Type exports
 export type CreateUserInput = z.infer<typeof createUserSchema>;
@@ -46,3 +64,4 @@ export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type CreateVacationRequestInput = z.infer<typeof createVacationRequestSchema>;
 export type UpdateRequestStatusInput = z.infer<typeof updateRequestStatusSchema>;
+export type UpdateVacationRequestInput = z.infer<typeof updateVacationRequestSchema>;

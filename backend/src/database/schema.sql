@@ -18,8 +18,11 @@ CREATE TABLE users (
     employee_code VARCHAR(7) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     role user_role NOT NULL DEFAULT 'employee',
+    vacation_days_total INTEGER NOT NULL DEFAULT 20,
+    vacation_days_used INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT valid_vacation_days CHECK (vacation_days_used >= 0 AND vacation_days_used <= vacation_days_total)
 );
 
 -- Vacation requests table
@@ -30,6 +33,9 @@ CREATE TABLE vacation_requests (
     end_date DATE NOT NULL,
     reason TEXT,
     status request_status NOT NULL DEFAULT 'pending',
+    manager_notes TEXT,
+    approved_by INTEGER REFERENCES users(id),
+    approved_at TIMESTAMP WITH TIME ZONE,
     submitted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT valid_date_range CHECK (end_date >= start_date)

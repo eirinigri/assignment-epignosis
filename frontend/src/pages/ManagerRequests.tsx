@@ -6,6 +6,12 @@ import type { VacationRequest } from '../types';
 export default function ManagerRequests() {
   const [requests, setRequests] = useState<VacationRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<VacationRequest | null>(null);
+  const [actionType, setActionType] = useState<'approve' | 'reject'>('approve');
+  const [managerNotes, setManagerNotes] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,7 +20,12 @@ export default function ManagerRequests() {
 
   const fetchRequests = async () => {
     try {
-      const response = await api.get('/requests');
+      const params = new URLSearchParams();
+      if (statusFilter) params.append('status', statusFilter);
+      if (searchTerm) params.append('search', searchTerm);
+      
+      const url = params.toString() ? `/requests?${params.toString()}` : '/requests';
+      const response = await api.get(url);
       setRequests(response.data.data);
     } catch (error) {
       console.error('Failed to fetch requests:', error);
@@ -23,21 +34,27 @@ export default function ManagerRequests() {
     }
   };
 
-  const handleApprove = async (id: number) => {
-    try {
-      await api.put(`/requests/${id}/approve`);
-      fetchRequests();
-    } catch (error) {
-      alert('Failed to approve request');
-    }
+  const openNotesModal = (request: VacationRequest, action: 'approve' | 'reject') => {
+    setSelectedRequest(request);
+    setActionType(action);
+    setManagerNotes('');
+    setShowNotesModal(true);
   };
 
-  const handleReject = async (id: number) => {
+  const handleSubmitAction = async () => {
+    if (!selectedRequest) return;
+
     try {
-      await api.put(`/requests/${id}/reject`);
+      const endpoint = actionType === 'approve' ? 'approve' : 'reject';
+      await api.put(`/requests/${selectedRequest.id}/${endpoint}`, {
+        manager_notes: managerNotes || undefined
+      });
+      setShowNotesModal(false);
+      setSelectedRequest(null);
+      setManagerNotes('');
       fetchRequests();
     } catch (error) {
-      alert('Failed to reject request');
+      alert(`Failed to ${actionType} request`);
     }
   };
 
@@ -70,6 +87,12 @@ export default function ManagerRequests() {
                 >
                   Vacation Requests
                 </button>
+                <button
+                  onClick={() => navigate('/manager/analytics')}
+                  className="px-3 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+                >
+                  Analytics
+                </button>
               </nav>
               <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
                 Manager
@@ -87,6 +110,34 @@ export default function ManagerRequests() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Filters */}
+        <div className="mb-6 flex gap-4">
+          <select
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value); fetchRequests(); }}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Search by employee name or reason..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && fetchRequests()}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={fetchRequests}
+            className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition"
+          >
+            Search
+          </button>
+        </div>
+
         {/* Pending Requests Section */}
         <div className="mb-8">
           <div className="mb-6">
@@ -147,11 +198,11 @@ export default function ManagerRequests() {
                           })}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
                           {request.start_date} → {request.end_date}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 mt-1">
                           {Math.ceil((new Date(request.end_date).getTime() - new Date(request.start_date).getTime()) / (1000 * 60 * 60 * 24)) + 1} days
                         </div>
                       </td>
@@ -162,13 +213,13 @@ export default function ManagerRequests() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
-                          onClick={() => handleApprove(request.id)}
+                          onClick={() => openNotesModal(request, 'approve')}
                           className="inline-flex items-center px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition mr-2"
                         >
                           ✓ Approve
                         </button>
                         <button
-                          onClick={() => handleReject(request.id)}
+                          onClick={() => openNotesModal(request, 'reject')}
                           className="inline-flex items-center px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
                         >
                           ✗ Reject
@@ -241,6 +292,62 @@ export default function ManagerRequests() {
           </div>
         )}
       </div>
+
+      {/* Notes Modal */}
+      {showNotesModal && selectedRequest && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              {actionType === 'approve' ? 'Approve' : 'Reject'} Vacation Request
+            </h3>
+            
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+              <div className="text-sm text-gray-600 mb-1">Employee</div>
+              <div className="font-medium text-gray-900">{selectedRequest.user_name}</div>
+              <div className="text-sm text-gray-600 mt-2">Dates</div>
+              <div className="font-medium text-gray-900">
+                {selectedRequest.start_date} → {selectedRequest.end_date}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Notes (optional)
+              </label>
+              <textarea
+                value={managerNotes}
+                onChange={(e) => setManagerNotes(e.target.value)}
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                placeholder={`Add optional notes for the employee...`}
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleSubmitAction}
+                className={`flex-1 px-4 py-2 rounded-lg font-semibold text-white transition ${
+                  actionType === 'approve'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-red-600 hover:bg-red-700'
+                }`}
+              >
+                {actionType === 'approve' ? 'Approve' : 'Reject'}
+              </button>
+              <button
+                onClick={() => {
+                  setShowNotesModal(false);
+                  setSelectedRequest(null);
+                  setManagerNotes('');
+                }}
+                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

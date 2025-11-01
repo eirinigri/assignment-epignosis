@@ -7,6 +7,8 @@ export interface User {
   email: string;
   employee_code: string;
   role: UserRole;
+  vacation_days_total: number;
+  vacation_days_used: number;
   created_at: Date;
   updated_at: Date;
 }
@@ -25,6 +27,9 @@ export interface VacationRequest {
   end_date: string;
   reason: string | null;
   status: RequestStatus;
+  manager_notes: string | null;
+  approved_by: number | null;
+  approved_at: Date | null;
   submitted_at: Date;
   updated_at: Date;
 }

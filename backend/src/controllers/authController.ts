@@ -46,6 +46,7 @@ export async function login(req: Request, res: Response): Promise<void> {
     if (error instanceof Error && 'issues' in error) {
       sendError(res, 400, 'Validation error: ' + JSON.stringify(error));
     } else {
+      console.error('Login error:', error);
       sendError(res, 500, 'Internal server error');
     }
   }

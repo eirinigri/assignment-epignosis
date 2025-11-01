@@ -3,6 +3,7 @@ import { authenticate, authorize, pathToRegex, extractParams, parseQuery, handle
 import * as authController from './controllers/authController.js';
 import * as userController from './controllers/userController.js';
 import * as vacationRequestController from './controllers/vacationRequestController.js';
+import * as analyticsController from './controllers/analyticsController.js';
 
 // Define routes
 const routes: Route[] = [];
@@ -27,9 +28,13 @@ addRoute('DELETE', '/api/users/:id', authenticate(authorize('manager')(userContr
 addRoute('GET', '/api/requests', authenticate(vacationRequestController.getAllRequests));
 addRoute('GET', '/api/requests/:id', authenticate(vacationRequestController.getRequestById));
 addRoute('POST', '/api/requests', authenticate(authorize('employee')(vacationRequestController.createRequest)));
+addRoute('PUT', '/api/requests/:id', authenticate(vacationRequestController.updateRequest));
 addRoute('PUT', '/api/requests/:id/approve', authenticate(authorize('manager')(vacationRequestController.approveRequest)));
 addRoute('PUT', '/api/requests/:id/reject', authenticate(authorize('manager')(vacationRequestController.rejectRequest)));
 addRoute('DELETE', '/api/requests/:id', authenticate(vacationRequestController.deleteRequest));
+
+// Analytics routes (Manager only)
+addRoute('GET', '/api/analytics', authenticate(authorize('manager')(analyticsController.getAnalytics)));
 
 /**
  * Main request handler
