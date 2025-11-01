@@ -9,13 +9,17 @@ Full-stack TypeScript application for managing employee vacation requests with r
 - Vacation Approval: View all requests, approve or reject with optional notes
 - Request Dashboard: Separate views for pending and processed requests
 - Employee Details: See requester information with each vacation request
+- Advanced Filtering: Filter by status and search by employee name or reason
+- Analytics Dashboard: View comprehensive statistics and trends
 
 **Employee Features:**
 - Request Management: Create vacation requests with date range and optional reason
+- Request Editing: Modify pending requests before approval
 - Status Tracking: View all personal requests with status (pending, approved, rejected)
 - Request Control: Delete pending requests before approval
 - Vacation Balance: Track remaining vacation days with visual progress indicator
 - Manager Feedback: View manager notes on approved/rejected requests
+- Advanced Filtering: Filter by status and search requests
 
 **Security:**
 - JWT authentication with bcrypt password hashing
