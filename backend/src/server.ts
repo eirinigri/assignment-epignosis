@@ -36,9 +36,11 @@ async function startServer() {
     console.log('  GET    /api/requests');
     console.log('  POST   /api/requests');
     console.log('  GET    /api/requests/:id');
+    console.log('  PUT    /api/requests/:id');
     console.log('  PUT    /api/requests/:id/approve');
     console.log('  PUT    /api/requests/:id/reject');
     console.log('  DELETE /api/requests/:id');
+    console.log('  GET    /api/analytics');
     console.log('\n');
   });
 

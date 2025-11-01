@@ -60,6 +60,12 @@ export default function ManagerUsers() {
                 >
                   Vacation Requests
                 </button>
+                <button
+                  onClick={() => navigate('/manager/analytics')}
+                  className="px-3 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+                >
+                  Analytics
+                </button>
               </nav>
               <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
                 Manager
